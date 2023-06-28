@@ -1,0 +1,53 @@
+# Default values for infini-console.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image: 
+  name: infinilabs/console
+  tag: 
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+priorityClassName: ""
+restartPolicy: Always
+tolerations: []
+affinity: {}
+
+storageClassName: standard
+
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 2
+    memory: 4Gi
+
+console: ""
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 9000
+
+ingress:
+  enabled: false
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
