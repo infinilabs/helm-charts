@@ -37,6 +37,11 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          volumeMounts:
+            - name: infini-console-data
+              mountPath: /data
+            - name: infini-console-config
+              mountPath: /config
           livenessProbe:
             httpGet:
               path: /
@@ -47,6 +52,11 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: infini-console-data
+          emptyDir: {}
+        - name: infini-console-cfg
+          emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -59,3 +69,20 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: infini-console-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.storageClassName }}
+        resources:
+          requests:
+            storage: 50Gi
+    - metadata:
+        name: infini-console-config
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.storageClassName }}
+        resources:
+          requests:
+            storage: 1Gi
