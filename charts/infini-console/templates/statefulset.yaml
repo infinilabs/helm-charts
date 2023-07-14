@@ -27,6 +27,14 @@ spec:
       serviceAccountName: {{ include "infini-console.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init-{{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: ['sh', '-c', 'cp -r /opt/console/config/* /config']
+          volumeMounts:
+            - name: infini-console-config
+              mountPath: /config
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -39,23 +47,15 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: infini-console-data
-              mountPath: /data
+              mountPath: /opt/console/data
             - name: infini-console-config
-              mountPath: /config
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+              mountPath: /opt/console/config
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: infini-console-data
           emptyDir: {}
-        - name: infini-console-cfg
+        - name: infini-console-config
           emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
