@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "infini-easysearch.fullname" . }}-svc-headless
+  labels:
+    {{- include "infini-easysearch.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "infini-easysearch.selectorLabels" . | nindent 4 }}
+  clusterIP: None
+  ports:
+    - name: http
+      port: {{ .Values.service.http }}
+    - name: transport
+      port: {{ .Values.service.transport }}
