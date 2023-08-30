@@ -6,6 +6,7 @@ clusterName: infinilabs
 replicaCount: 3
 masterHosts: '"infini-easysearch-0","infini-easysearch-1","infini-easysearch-2"'
 discoverySeedHosts: '"infini-easysearch-0.infini-easysearch-svc-headless","infini-easysearch-1.infini-easysearch-svc-headless","infini-easysearch-2.infini-easysearch-svc-headless"'
+nodeRoles: '"master","data","ingest","remote_cluster_client"'
 
 image:
   repository: docker.io/infinilabs/easysearch
@@ -93,3 +94,4 @@ tolerations: []
 affinity: {}
 
 storageClassName: local-path
+dataVolumeStorage: 100Gi

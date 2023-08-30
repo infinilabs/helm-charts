@@ -31,6 +31,7 @@ data:
     network.host: 0.0.0.0
     http.port: 9200
     transport.port: 9300
+    node.roles: [{\{getenv "NODE_ROLES"}\}]
     discovery.seed_hosts: [{\{getenv "DISCOVERY_SEED_HOSTS"}\}]
     cluster.initial_master_nodes: [{\{getenv "MASTER_HOSTS"}\}]
     #gateway.recover_after_nodes: 3
