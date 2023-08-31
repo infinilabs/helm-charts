@@ -83,3 +83,4 @@ tolerations: []
 affinity: {}
 
 storageClassName: local-path
+dataVolumeStorage: 100Gi

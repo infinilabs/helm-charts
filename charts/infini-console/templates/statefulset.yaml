@@ -77,7 +77,7 @@ spec:
         storageClassName: {{ .Values.storageClassName }}
         resources:
           requests:
-            storage: 50Gi
+            storage: {{ .Values.dataVolumeStorage }}
     - metadata:
         name: infini-console-config
       spec:
