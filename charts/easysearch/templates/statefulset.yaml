@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}
+  name: {{ include "easysearch.fullname" . }}
   labels:
-    {{- include "infini-easysearch.labels" . | nindent 4 }}
+    {{- include "easysearch.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "infini-easysearch.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "infini-easysearch.fullname" . }}-svc-headless
+      {{- include "easysearch.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "easysearch.fullname" . }}-svc-headless
   minReadySeconds: 30
   template:
     metadata:
@@ -20,13 +20,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "infini-easysearch.selectorLabels" . | nindent 8 }}
+        {{- include "easysearch.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "infini-easysearch.serviceAccountName" . }}
+      serviceAccountName: {{ include "easysearch.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -48,22 +48,22 @@ spec:
               value: '{{- toString .Values.nodeRoles }}'
           command: ['/sbin/unitMGR']
           volumeMounts:
-            - name: infini-easysearch-config
+            - name: easysearch-config
               mountPath: /etc/confd
-            - name: infini-easysearch-tls
+            - name: easysearch-tls
               mountPath: /app/easysearch/config/ca.crt
               subPath: ca.crt
-            - name: infini-easysearch-tls
+            - name: easysearch-tls
               mountPath: /app/easysearch/config/instance.crt
               subPath: instance.crt
-            - name: infini-easysearch-tls
+            - name: easysearch-tls
               mountPath: /app/easysearch/config/instance.key
               subPath: instance.key
-            - name: infini-easysearch-confd-toml
+            - name: easysearch-confd-toml
               mountPath: /tmp/confd/conf.d
-            - name: infini-easysearch-confd-tmpl
+            - name: easysearch-confd-tmpl
               mountPath: /tmp/confd/templates
-            - name: infini-easysearch-config-script
+            - name: easysearch-config-script
               mountPath: /sbin/unitMGR
               subPath: unitMGR
       containers:
@@ -80,45 +80,45 @@ spec:
               containerPort: {{ .Values.service.transport }}
               protocol: TCP
           volumeMounts:
-            - name: infini-easysearch-data
+            - name: easysearch-data
               mountPath: /app/easysearch/data
-            - name: infini-easysearch-config
+            - name: easysearch-config
               mountPath: /app/easysearch/config
-            - name: infini-easysearch-init-script
+            - name: easysearch-init-script
               mountPath: /app/easysearch/bin/initialize.sh
               subPath: initialize.sh
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-        - name: infini-easysearch-data
+        - name: easysearch-data
           emptyDir: {}
-        - name: infini-easysearch-config
+        - name: easysearch-config
           emptyDir: {}
-        - name: infini-easysearch-init-script
+        - name: easysearch-init-script
           configMap:
-            name: {{ include "infini-easysearch.fullname" . }}-init-script
+            name: {{ include "easysearch.fullname" . }}-init-script
             defaultMode: 493
             items: 
               - key: initialize.sh
                 path: initialize.sh
-        - name: infini-easysearch-config-script
+        - name: easysearch-config-script
           configMap:
-            name: {{ include "infini-easysearch.fullname" . }}-config-script
+            name: {{ include "easysearch.fullname" . }}-config-script
             defaultMode: 493
             items: 
               - key: unitMGR
                 path: unitMGR
-        - name: infini-easysearch-confd-toml
+        - name: easysearch-confd-toml
           configMap:
-            name: {{ include "infini-easysearch.fullname" . }}-confd-toml
+            name: {{ include "easysearch.fullname" . }}-confd-toml
             defaultMode: 420
-        - name: infini-easysearch-confd-tmpl
+        - name: easysearch-confd-tmpl
           configMap:
-            name: {{ include "infini-easysearch.fullname" . }}-confd-tmpl
+            name: {{ include "easysearch.fullname" . }}-confd-tmpl
             defaultMode: 420
-        - name: infini-easysearch-tls
+        - name: easysearch-tls
           secret:
-            secretName: {{ include "infini-easysearch.fullname" . }}-ca-secret
+            secretName: {{ include "easysearch.fullname" . }}-ca-secret
             defaultMode: 0600
             items:
               - key: ca.crt
@@ -141,7 +141,7 @@ spec:
       {{- end }}
   volumeClaimTemplates:
     - metadata:
-        name: infini-easysearch-data
+        name: easysearch-data
       spec:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: {{ .Values.storageClassName }}
@@ -149,7 +149,7 @@ spec:
           requests:
             storage: {{ .Values.dataVolumeStorage }}
     - metadata:
-        name: infini-easysearch-config
+        name: easysearch-config
       spec:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: {{ .Values.storageClassName }}

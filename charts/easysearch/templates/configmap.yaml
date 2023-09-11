@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}-confd-toml
+  name: {{ include "easysearch.fullname" . }}-confd-toml
   labels:
-    {{- include "infini-easysearch.labels" . | nindent 4 }}
+    {{- include "easysearch.labels" . | nindent 4 }}
 data:
   confd.toml: |
     [template]
@@ -17,9 +17,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}-confd-tmpl
+  name: {{ include "easysearch.fullname" . }}-confd-tmpl
   labels:
-    {{- include "infini-easysearch.labels" . | nindent 4 }}
+    {{- include "easysearch.labels" . | nindent 4 }}
 data:
   confd.tmpl: |-
     cluster.name: {\{getenv "CLUSTER_NAME"}\}
@@ -85,18 +85,18 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}-init-script
+  name: {{ include "easysearch.fullname" . }}-init-script
   labels:
-    {{- include "infini-easysearch.labels" . | nindent 4 }}
+    {{- include "easysearch.labels" . | nindent 4 }}
 data:
   initialize.sh: |
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}-config-script
+  name: {{ include "easysearch.fullname" . }}-config-script
   labels:
-    {{- include "infini-easysearch.labels" . | nindent 4 }}
+    {{- include "easysearch.labels" . | nindent 4 }}
 data:
   unitMGR: |
     #!/usr/bin/env bash

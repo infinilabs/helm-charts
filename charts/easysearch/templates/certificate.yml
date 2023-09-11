@@ -1,20 +1,20 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}-ca
+  name: {{ include "easysearch.fullname" . }}-ca
 spec:
   dnsNames:
   - infini.cloud
   duration: 87600h0m0s
   issuerRef:
     kind: Issuer
-    name: {{ include "infini-easysearch.fullname" . }}-issuer
+    name: {{ include "easysearch.fullname" . }}-issuer
   privateKey:
     algorithm: RSA
     encoding: PKCS8
     size: 2048
   renewBefore: 2160h0m0s
-  secretName: {{ include "infini-easysearch.fullname" . }}-ca-secret
+  secretName: {{ include "easysearch.fullname" . }}-ca-secret
   subject:
     organizations:
     - infinilabs

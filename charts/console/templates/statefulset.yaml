@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "infini-console.fullname" . }}
+  name: {{ include "console.fullname" . }}
   labels:
-    {{- include "infini-console.labels" . | nindent 4 }}
+    {{- include "console.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "infini-console.selectorLabels" . | nindent 6 }}
+      {{- include "console.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "infini-console.selectorLabels" . | nindent 8 }}
+        {{- include "console.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "infini-console.serviceAccountName" . }}
+      serviceAccountName: {{ include "console.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -33,7 +33,7 @@ spec:
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           command: ['sh', '-c', 'cp -r /opt/console/config/* /config']
           volumeMounts:
-            - name: infini-console-config
+            - name: console-config
               mountPath: /config
       containers:
         - name: {{ .Chart.Name }}
@@ -46,16 +46,16 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           volumeMounts:
-            - name: infini-console-data
+            - name: console-data
               mountPath: /opt/console/data
-            - name: infini-console-config
+            - name: console-config
               mountPath: /opt/console/config
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-        - name: infini-console-data
+        - name: console-data
           emptyDir: {}
-        - name: infini-console-config
+        - name: console-config
           emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -71,7 +71,7 @@ spec:
       {{- end }}
   volumeClaimTemplates:
     - metadata:
-        name: infini-console-data
+        name: console-data
       spec:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: {{ .Values.storageClassName }}
@@ -79,7 +79,7 @@ spec:
           requests:
             storage: {{ .Values.dataVolumeStorage }}
     - metadata:
-        name: infini-console-config
+        name: console-config
       spec:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: {{ .Values.storageClassName }}

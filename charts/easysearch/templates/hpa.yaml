@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "infini-easysearch.fullname" . }}
+  name: {{ include "easysearch.fullname" . }}
   labels:
-    {{- include "infini-easysearch.labels" . | nindent 4 }}
+    {{- include "easysearch.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "infini-easysearch.fullname" . }}
+    name: {{ include "easysearch.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
