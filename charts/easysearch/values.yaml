@@ -9,7 +9,7 @@ discoverySeedHosts: '"infini-easysearch-0.infini-easysearch-svc-headless","infin
 nodeRoles: '"master","data","ingest","remote_cluster_client"'
 
 image:
-  repository: docker.io/infinilabs/easysearch
+  repository: infinilabs/easysearch
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

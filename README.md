@@ -1,49 +1,52 @@
-# **Infinilabs Charts**
+# **Infinilabs Helm Charts**
 
-## 准备工作
-下载 Infinilabs Charts 包
-```
-git clone https://git.infini.ltd:64443/infini/helm-charts.git
-```
+## Usage
 
-在 Kubernetes 上创建一个 namespace：
-```
-kubectl create ns infini
-```
+[Helm](https://helm.sh) must be installed to use the charts. Please refer to
+Helm's [documentation](https://helm.sh/docs) to get started.
 
-## Console
+Once Helm has been set up correctly, add the repo as follows:
 
-### 快速部署
-```
-cd chart/infini-console
-#部署 Console Chart, 版本名称为 infini-console
-helm install infini-console . -n infini
-```
+    helm repo add infinilabs https://helm.infinilabs.com
 
-## Easysearch
+If you had already added this repo earlier, run `helm repo update` to retrieve
+the latest versions of the packages. You can then run `helm search repo
+infinilabs` to see the charts.
 
-### 快速部署
-```
-cd chart/infini-easysearch
-#自签 CA 证书
-kubectl apply -f ca-secret.yaml -n infini
-#部署 Easysearch Chart, 版本名称为 infini-easysearch
-helm install infini-easysearch . -n infini
-```
+### Console
 
-### 配置文件
-```
-cat chart/infini-easysearch/values.yaml
-...
-#集群名称
-clusterName: infinilabs
-replicaCount: 3             
-#主节点列表（默认版本名称是 infini-easysearch，如有变动需调整下面 masterHosts、discoverySeedHosts 值 ）
-masterHosts: '"infini-easysearch-0","infini-easysearch-1","infini-easysearch-2"'
-discoverySeedHosts: '"infini-easysearch-0.infini-easysearch-svc-headless","infini-easysearch-1.infini-easysearch-svc-headless","infini-easysearch-2.infini-easysearch-svc-headless"'
-#节点角色（可按需调整）
-nodeRoles: '"master","data","ingest","remote_cluster_client"'
-...
-storageClassName: local-path
-dataVolumeStorage: 100Gi
-```
+#### Quick Start
+
+    helm install infini-console infinilabs/console
+
+
+### Easysearch
+
+#### Quick Start
+
+    cat << EOF | kubectl apply -f -
+    apiVersion: cert-manager.io/v1
+    kind: Issuer
+    metadata:
+      name: issuer-ca
+    spec:
+      selfSigned: {}
+    ---
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: certificate-ca
+    spec:
+      commonName: certificate-ca
+      duration: 87600h0m0s
+      isCA: true
+      issuerRef:
+        kind: Issuer
+        name: issuer-ca
+      privateKey:
+        algorithm: ECDSA
+        size: 256
+      renewBefore: 2160h0m0s
+      secretName: ca-secret
+
+    helm install infini-easysearch infinilabs/easysearch

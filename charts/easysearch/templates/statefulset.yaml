@@ -12,6 +12,7 @@ spec:
     matchLabels:
       {{- include "infini-easysearch.selectorLabels" . | nindent 6 }}
   serviceName: {{ include "infini-easysearch.fullname" . }}-svc-headless
+  minReadySeconds: 30
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -47,8 +48,6 @@ spec:
               value: '{{- toString .Values.nodeRoles }}'
           command: ['/sbin/unitMGR']
           volumeMounts:
-            - name: infini-easysearch-data
-              mountPath: /app/easysearch/data
             - name: infini-easysearch-config
               mountPath: /etc/confd
             - name: infini-easysearch-tls
@@ -64,7 +63,7 @@ spec:
               mountPath: /tmp/confd/conf.d
             - name: infini-easysearch-confd-tmpl
               mountPath: /tmp/confd/templates
-            - name: infini-easysearch-init-script
+            - name: infini-easysearch-config-script
               mountPath: /sbin/unitMGR
               subPath: unitMGR
       containers:
@@ -73,19 +72,6 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: CLUSTER_NAME
-              value: {{ .Values.clusterName }}
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: MASTER_HOSTS
-              value: '{{- toString .Values.masterHosts }}'
-            - name: DISCOVERY_SEED_HOSTS
-              value: '{{- toString .Values.discoverySeedHosts }}'
-            - name: NODE_ROLES
-              value: '{{- toString .Values.nodeRoles }}'
           ports:
             - name: http
               containerPort: {{ .Values.service.http }}
@@ -98,22 +84,9 @@ spec:
               mountPath: /app/easysearch/data
             - name: infini-easysearch-config
               mountPath: /app/easysearch/config
-            - name: infini-easysearch-tls
-              mountPath: /app/easysearch/config/ca.crt
-              subPath: ca.crt
-            - name: infini-easysearch-tls
-              mountPath: /app/easysearch/config/instance.crt
-              subPath: instance.crt
-            - name: infini-easysearch-tls
-              mountPath: /app/easysearch/config/instance.key
-              subPath: instance.key
-            - name: infini-easysearch-confd-toml
-              mountPath: /tmp/confd/conf.d
-            - name: infini-easysearch-confd-tmpl
-              mountPath: /tmp/confd/templates
             - name: infini-easysearch-init-script
-              mountPath: /sbin/unitMGR
-              subPath: unitMGR
+              mountPath: /app/easysearch/bin/initialize.sh
+              subPath: initialize.sh
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -124,6 +97,13 @@ spec:
         - name: infini-easysearch-init-script
           configMap:
             name: {{ include "infini-easysearch.fullname" . }}-init-script
+            defaultMode: 493
+            items: 
+              - key: initialize.sh
+                path: initialize.sh
+        - name: infini-easysearch-config-script
+          configMap:
+            name: {{ include "infini-easysearch.fullname" . }}-config-script
             defaultMode: 493
             items: 
               - key: unitMGR

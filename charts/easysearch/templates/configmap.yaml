@@ -89,6 +89,15 @@ metadata:
   labels:
     {{- include "infini-easysearch.labels" . | nindent 4 }}
 data:
+  initialize.sh: |
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "infini-easysearch.fullname" . }}-config-script
+  labels:
+    {{- include "infini-easysearch.labels" . | nindent 4 }}
+data:
   unitMGR: |
     #!/usr/bin/env bash
 
