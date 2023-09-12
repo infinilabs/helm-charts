@@ -118,7 +118,7 @@ spec:
             defaultMode: 420
         - name: easysearch-tls
           secret:
-            secretName: {{ include "easysearch.fullname" . }}-ca-secret
+            secretName: {{ include "easysearch.fullname" . }}-instance-secret
             defaultMode: 0600
             items:
               - key: ca.crt

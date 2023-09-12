@@ -1,7 +1,14 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: {{ include "easysearch.fullname" . }}-issuer
+  name: {{ include "easysearch.fullname" . }}-ca-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "easysearch.fullname" . }}-instance-issuer
 spec:
   ca:
-    secretName: ca-secret
+    secretName: {{ include "easysearch.fullname" . }}-ca-secret

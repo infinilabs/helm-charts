@@ -1,20 +1,37 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ include "easysearch.fullname" . }}-ca
+  name: {{ include "easysearch.fullname" . }}-ca-certificate
+spec:
+  commonName: {{ include "easysearch.fullname" . }}-ca-certificate
+  duration: 87600h0m0s
+  isCA: true
+  issuerRef:
+    kind: Issuer
+    name: {{ include "easysearch.fullname" . }}-ca-issuer
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  renewBefore: 2160h0m0s
+  secretName: {{ include "easysearch.fullname" . }}-ca-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "easysearch.fullname" . }}-instance-certificate
 spec:
   dnsNames:
   - infini.cloud
   duration: 87600h0m0s
   issuerRef:
     kind: Issuer
-    name: {{ include "easysearch.fullname" . }}-issuer
+    name: {{ include "easysearch.fullname" . }}-instance-issuer
   privateKey:
     algorithm: RSA
     encoding: PKCS8
     size: 2048
   renewBefore: 2160h0m0s
-  secretName: {{ include "easysearch.fullname" . }}-ca-secret
+  secretName: {{ include "easysearch.fullname" . }}-instance-secret
   subject:
     organizations:
     - infinilabs

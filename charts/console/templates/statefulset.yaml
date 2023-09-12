@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "console.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "console.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}

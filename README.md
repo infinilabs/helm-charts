@@ -17,36 +17,11 @@ infinilabs` to see the charts.
 
 #### Quick Start
 
-    helm install infini-console infinilabs/console
+    helm install console infinilabs/console
 
 
 ### Easysearch
 
 #### Quick Start
 
-    cat << EOF | kubectl apply -f -
-    apiVersion: cert-manager.io/v1
-    kind: Issuer
-    metadata:
-      name: issuer-ca
-    spec:
-      selfSigned: {}
-    ---
-    apiVersion: cert-manager.io/v1
-    kind: Certificate
-    metadata:
-      name: certificate-ca
-    spec:
-      commonName: certificate-ca
-      duration: 87600h0m0s
-      isCA: true
-      issuerRef:
-        kind: Issuer
-        name: issuer-ca
-      privateKey:
-        algorithm: ECDSA
-        size: 256
-      renewBefore: 2160h0m0s
-      secretName: ca-secret
-
-    helm install infini-easysearch infinilabs/easysearch
+    helm install easysearch infinilabs/easysearch
