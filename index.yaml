@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  console:
+  - apiVersion: v2
+    appVersion: 1.7.0-1238
+    created: "2023-09-14T00:26:59.902728+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 200aa63b785f5048c265519e85ef1e23221c1a6f7de9ea19b376d7d990569268
+    name: console
+    type: application
+    urls:
+    - console-0.1.0.tgz
+    version: 0.1.0
+  easysearch:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2023-09-14T00:27:00.460315+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 1877ac16c295d95f8d7602a1544691cb886a5cc376d9142477377c9eda2afda1
+    name: easysearch
+    type: application
+    urls:
+    - easysearch-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-09-14T00:27:00.460328+08:00"
