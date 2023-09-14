@@ -99,7 +99,7 @@ metadata:
     {{- include "easysearch.labels" . | nindent 4 }}
 data:
   unitMGR: |
-    #!/usr/bin/env sh
+    #!/bin/bash
 
     if [ -f "/etc/confd/easysearch.yml" ]; then
       rm -rf /etc/confd/*

@@ -3,9 +3,9 @@
 # Declare variables to be passed into your templates.
 
 clusterName: infinilabs
-replicaCount: 3
-masterHosts: '"easysearch-0","easysearch-1","easysearch-2"'
-discoverySeedHosts: '"easysearch-0.easysearch-svc-headless","easysearch-1.easysearch-svc-headless","easysearch-2.easysearch-svc-headless"'
+replicaCount: 1
+masterHosts: '"easysearch-0"'
+discoverySeedHosts: '"easysearch-0.easysearch-svc-headless"'
 nodeRoles: '"master","data","ingest","remote_cluster_client"'
 
 image:
