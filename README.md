@@ -19,6 +19,9 @@ infinilabs` to see the charts.
 
     helm install console infinilabs/console -n <namespace>
 
+#### Uninstall
+    helm uninstall console -n <namespace>
+    kubectl delete pvc console-data-console-0 console-config-console-0 -n <namespace>
 
 ### Easysearch
 
@@ -32,3 +35,7 @@ Note: If you want use other StorageClass(installed), you can create `vaules.yaml
 #### Quick Start
 
     helm install easysearch infinilabs/easysearch -n <namespace>
+  
+#### Uninstall
+    helm uninstall easysearch -n <namespace>
+    kubectl delete pvc easysearch-data-easysearch-0 easysearch-config-easysearch-0 -n <namespace>
