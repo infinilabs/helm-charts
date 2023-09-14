@@ -17,11 +17,18 @@ infinilabs` to see the charts.
 
 #### Quick Start
 
-    helm install console infinilabs/console
+    helm install console infinilabs/console -n <namespace>
 
 
 ### Easysearch
 
+#### Prerequisites
+
++ [cert-manager](https://cert-manager.io/docs/installation/)
++ [local-path](https://github.com/rancher/local-path-provisioner)
+
+Note: If you want use other StorageClass(installed), you can create `vaules.yaml` file that it contains 'storageClassName: \<storageClassName\>' and use it (eg. helm install -f values.yaml).
+
 #### Quick Start
 
-    helm install easysearch infinilabs/easysearch
+    helm install easysearch infinilabs/easysearch -n <namespace>
