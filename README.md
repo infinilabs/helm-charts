@@ -17,11 +17,11 @@ infinilabs` to see the charts.
 
 #### Quick Start
 
-    helm install console infinilabs/console -n <namespace>
+    ~ helm install console infinilabs/console -n <namespace>
 
 #### Uninstall
-    helm uninstall console -n <namespace>
-    kubectl delete pvc console-data-console-0 console-config-console-0 -n <namespace>
+    ~ helm uninstall console -n <namespace>
+    ~ kubectl delete pvc console-data-console-0 console-config-console-0 -n <namespace>
 
 ### Easysearch
 
@@ -34,8 +34,34 @@ Note: If you want use other StorageClass(installed), you can create `vaules.yaml
 
 #### Quick Start
 
-    helm install easysearch infinilabs/easysearch -n <namespace>
+    ~ cat << EOF | kubectl apply -n <namespace> -f -
+    apiVersion: cert-manager.io/v1
+    kind: Issuer
+    metadata:
+      name: easysearch-ca-issuer
+    spec:
+      selfSigned: {}
+    ---
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: easysearch-ca-certificate
+    spec:
+      commonName: easysearch-ca-certificate
+      duration: 87600h0m0s
+      isCA: true
+      issuerRef:
+        kind: Issuer
+        name: easysearch-ca-issuer
+      privateKey:
+        algorithm: ECDSA
+        size: 256
+      renewBefore: 2160h0m0s
+      secretName: easysearch-ca-secret
+    EOF
+
+    ~ helm install easysearch infinilabs/easysearch -n <namespace>
   
 #### Uninstall
-    helm uninstall easysearch -n <namespace>
-    kubectl delete pvc easysearch-data-easysearch-0 easysearch-config-easysearch-0 -n <namespace>
+    ~ helm uninstall easysearch -n <namespace>
+    ~ kubectl delete pvc easysearch-data-easysearch-0 easysearch-config-easysearch-0 -n <namespace>

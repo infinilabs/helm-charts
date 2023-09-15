@@ -1,23 +1,6 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ include "easysearch.fullname" . }}-ca-certificate
-spec:
-  commonName: {{ include "easysearch.fullname" . }}-ca-certificate
-  duration: 87600h0m0s
-  isCA: true
-  issuerRef:
-    kind: Issuer
-    name: {{ include "easysearch.fullname" . }}-ca-issuer
-  privateKey:
-    algorithm: ECDSA
-    size: 256
-  renewBefore: 2160h0m0s
-  secretName: {{ include "easysearch.fullname" . }}-ca-secret
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
   name: {{ include "easysearch.fullname" . }}-instance-certificate
 spec:
   dnsNames:
