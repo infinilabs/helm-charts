@@ -7,11 +7,13 @@ Helm's [documentation](https://helm.sh/docs) to get started.
 
 Once Helm has been set up correctly, add the repo as follows:
 
-    helm repo add infinilabs https://helm.infinilabs.com
+    ~ helm repo add infinilabs https://helm.infinilabs.com
 
 If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages. You can then run `helm search repo
 infinilabs` to see the charts.
+
+Note: The default storageClass of these charts use is [local-path](https://github.com/rancher/local-path-provisioner). If you want use other StorageClass(installed), you can create `vaules.yaml` file that it contains 'storageClassName: \<storageClassName\>' and use it (eg. helm install -f values.yaml).
 
 ### Console
 
@@ -28,9 +30,6 @@ infinilabs` to see the charts.
 #### Prerequisites
 
 + [cert-manager](https://cert-manager.io/docs/installation/)
-+ [local-path](https://github.com/rancher/local-path-provisioner)
-
-Note: If you want use other StorageClass(installed), you can create `vaules.yaml` file that it contains 'storageClassName: \<storageClassName\>' and use it (eg. helm install -f values.yaml).
 
 #### Quick Start
 
