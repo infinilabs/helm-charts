@@ -1,15 +1,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "easysearch.fullname" . }}-svc-headless
+  name: {{ include "easysearch.fullname" . }}
   labels:
     {{- include "easysearch.labels" . | nindent 4 }}
 spec:
   selector:
     {{- include "easysearch.selectorLabels" . | nindent 4 }}
+  {{ if eq .Values.service.type "None" }}
   clusterIP: None
+  {{ else }}
+  type: {{ .Values.service.type }}
+  {{ end }}
   ports:
     - name: http
       port: {{ .Values.service.http }}
+      {{ if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.httpNodeport }}
+      {{ end }}
     - name: transport
       port: {{ .Values.service.transport }}
+      {{ if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.transNodeport }}
+      {{ end }}

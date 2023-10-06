@@ -101,9 +101,7 @@ data:
   unitMGR: |
     #!/bin/bash
 
-    if [ -f "/etc/confd/easysearch.yml" ]; then
-      rm -rf /etc/confd/*
-    fi
+    rm -rf /etc/confd/*
     cp -r /app/easysearch/config/* /etc/confd/
 
     mkdir /etc/confd/{conf.d,templates}

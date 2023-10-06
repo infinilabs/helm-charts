@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "console.fullname" . }}
+  name: {{ include "gateway.fullname" . }}
   labels:
-    {{- include "console.labels" . | nindent 4 }}
+    {{- include "gateway.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "console.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "console.fullname" . }}
+      {{- include "gateway.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "gateway.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,45 +19,59 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "console.selectorLabels" . | nindent 8 }}
+        {{- include "gateway.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "console.serviceAccountName" . }}
+      serviceAccountName: {{ include "gateway.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: init-{{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.imagePullPolicy }}
-          command: ['sh', '-c', 'if [ -z "$(ls -A /config_bak)" ]; then cp -rf /config/* /config_bak; else exit 0; fi']
-          volumeMounts:
-            - name: console-config
-              mountPath: /config_bak
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: LOGGING_ES_ENDPOINT
+              value: {{ .Values.env.loggingEsEndpoint }}
+            - name: LOGGING_ES_USER
+              value: {{ .Values.env.loggingEsUser }}
+            - name: LOGGING_ES_PASS
+              value: {{ .Values.env.loggingEsPass }}
+            - name: PROD_ES_ENDPOINT
+              value: {{ .Values.env.prodEsEndpoint }}
+            - name: PROD_ES_USER
+              value: {{ .Values.env.prodEsUser }}
+            - name: PROD_ES_PASS
+              value: {{ .Values.env.prodEsPass }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.httpPort }}
+              protocol: TCP
+            - name: api
+              containerPort: {{ .Values.service.apiPort }}
               protocol: TCP
           volumeMounts:
-            - name: console-data
+            - name: gateway-data
               mountPath: /data
-            - name: console-config
-              mountPath: /config
+            - name: gateway-config
+              mountPath: /gateway.yml
+              subPath: gateway.yml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-        - name: console-data
+        - name: gateway-data
           emptyDir: {}
-        - name: console-config
-          emptyDir: {}
+        - name: gateway-config
+          configMap:
+            name: {{ include "gateway.fullname" . }}-config
+            defaultMode: 420
+            items: 
+              - key: gateway.yml
+                path: gateway.yml
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -72,18 +86,10 @@ spec:
       {{- end }}
   volumeClaimTemplates:
     - metadata:
-        name: console-data
+        name: gateway-data
       spec:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: {{ .Values.storageClassName }}
         resources:
           requests:
             storage: {{ .Values.dataVolumeStorage }}
-    - metadata:
-        name: console-config
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        storageClassName: {{ .Values.storageClassName }}
-        resources:
-          requests:
-            storage: 1Gi

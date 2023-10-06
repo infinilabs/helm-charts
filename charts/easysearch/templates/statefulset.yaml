@@ -11,7 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "easysearch.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "easysearch.fullname" . }}-svc-headless
+  serviceName: {{ include "easysearch.fullname" . }}
   minReadySeconds: 30
   template:
     metadata:
