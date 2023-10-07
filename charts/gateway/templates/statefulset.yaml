@@ -58,7 +58,7 @@ spec:
             - name: gateway-data
               mountPath: /data
             - name: gateway-config
-              mountPath: /gateway.yml
+              mountPath: gateway.yml
               subPath: gateway.yml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
