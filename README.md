@@ -64,3 +64,17 @@ Note: The default storageClass of these charts use is [local-path](https://githu
 #### Uninstall
     ~ helm uninstall easysearch -n <namespace>
     ~ kubectl delete pvc easysearch-data-easysearch-0 easysearch-config-easysearch-0 -n <namespace>
+
+### Gateway
+
+#### Prerequisites
+
++ [Easysearch](#Easysearch)
+
+#### Quick Start
+
+    ~ helm install gateway infinilabs/gateway -n <namespace>
+
+#### Uninstall
+    ~ helm uninstall gateway -n <namespace>
+    ~ kubectl delete pvc gateway-data-easysearch-0 -n <namespace>
