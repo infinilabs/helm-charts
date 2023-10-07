@@ -77,4 +77,4 @@ Note: The default storageClass of these charts use is [local-path](https://githu
 
 #### Uninstall
     ~ helm uninstall gateway -n <namespace>
-    ~ kubectl delete pvc gateway-data-easysearch-0 -n <namespace>
+    ~ kubectl delete pvc gateway-data-gateway-0 -n <namespace>
