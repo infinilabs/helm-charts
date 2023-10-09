@@ -1,0 +1,56 @@
+apiVersion: v1
+entries:
+  console:
+  - apiVersion: v2
+    appVersion: 1.8.0-1259
+    created: "2023-10-09T08:34:13.714287+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 5d02ad0b6c479a7a99a4a05a17d0720a96a54d04a11fdb88dcf30b406cee7f5d
+    name: console
+    type: application
+    urls:
+    - console-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.7.0-1238
+    created: "2023-10-09T08:34:13.283925+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 727ea548a15beddb295572536b829ab4b967b1fe9e9a9ff8ec441fe7e30f3a3e
+    name: console
+    type: application
+    urls:
+    - console-0.1.0.tgz
+    version: 0.1.0
+  easysearch:
+  - apiVersion: v2
+    appVersion: 1.6.0-59
+    created: "2023-10-09T08:34:14.698978+08:00"
+    description: A Helm chart for Kubernetes
+    digest: b00f347069834cc13645011978ddb3a5bbb142ffcef6f088e06a696496194b80
+    name: easysearch
+    type: application
+    urls:
+    - easysearch-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.5.0-57
+    created: "2023-10-09T08:34:14.191451+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 56190a9aba1986ae23aa90b80ede14112af83b88800b82bfe7e9eedbdf438e06
+    name: easysearch
+    type: application
+    urls:
+    - easysearch-0.1.0.tgz
+    version: 0.1.0
+  gateway:
+  - apiVersion: v2
+    appVersion: 1.18.0-1123
+    created: "2023-10-09T08:34:15.238687+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 27c1286c148f2623b901c90610f5810fb4397f1e1ae0dac5209909cd147d512d
+    name: gateway
+    type: application
+    urls:
+    - gateway-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-10-09T08:34:15.23871+08:00"
