@@ -32,7 +32,7 @@ spec:
         - name: init-{{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
-          command: ['sh', '-c', 'if [ -z "$(ls -A /config_bak)" ]; then cp -rf /config/* /config_bak; else exit 0; fi']
+          command: ['sh', '-c', 'if [ ! -e /config_bak/certs ]; then cp -rf /config/* /config_bak; else exit 0; fi']
           volumeMounts:
             - name: console-config
               mountPath: /config_bak
