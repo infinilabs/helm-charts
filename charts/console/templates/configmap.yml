@@ -6,8 +6,7 @@ metadata:
     {{- include "console.labels" . | nindent 4 }}
 data:
   security.yml: |
-    security:
-      enabled: true
-      oauth:
-        enabled: false
+    {{- with .Values.security_file_content }}
+      {{- toYaml . | nindent 4 }}
+    {{- end  }}
 ---

@@ -84,3 +84,22 @@ affinity: {}
 
 storageClassName: local-path
 dataVolumeStorage: 100Gi
+
+#need change your settings for github sso
+security_file_content:
+  security:
+    enabled: true
+    oauth:
+      enabled: true
+      #only support github now
+      authorize_url: "https://github.com/login/oauth/authorize"
+      token_url: "https://github.com/login/oauth/access_token"
+      client_id: "your_github_acess_client_id"
+      client_secret: "your_github_acess_client_secret"
+      scopes: [ ]
+      #default for all sso users if no specify roles was defined
+      default_roles: ["ReadonlyUI","DATA"]
+      role_mapping:
+        medcl: ["Administrator"]
+        luohoufu: ["Administrator"]
+      redirect_url: "http://your_console_endpoint/sso/callback/"
