@@ -7,14 +7,14 @@ metadata:
 data:
   gateway.yml: |-
     #the env section used for setup default settings, it can be overwritten by system environments.
-    #eg: PROD_ES_ENDPOINT=http://192.168.3.185:9200 LOGGING_ES_ENDPOINT=http://192.168.3.185:9201  ./bin/gateway
+    #eg: PROD_ES_ENDPOINT=http://easysearch-0.easysearch:9200 LOGGING_ES_ENDPOINT=http://easysearch-0.easysearch:9201  ./bin/gateway
     env:
-      LOGGING_ES_ENDPOINT: https://localhost:9200
-      LOGGING_ES_USER: admin
-      LOGGING_ES_PASS: admin
-      PROD_ES_ENDPOINT: https://localhost:9200
-      PROD_ES_USER: admin
-      PROD_ES_PASS: admin
+      LOGGING_ES_ENDPOINT: "http://easysearch-0.easysearch:9200"
+      LOGGING_ES_USER: ""
+      LOGGING_ES_PASS: ""
+      PROD_ES_ENDPOINT: "http://easysearch-0.easysearch:9200"
+      PROD_ES_USER: ""
+      PROD_ES_PASS: ""
       GW_BINDING: "0.0.0.0:8000"
       API_BINDING: "0.0.0.0:2900"
     

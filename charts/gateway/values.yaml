@@ -3,12 +3,18 @@
 # Declare variables to be passed into your templates.
 
 env:
-  loggingEsEndpoint: https://easysearch-0.easysearch:9200
-  loggingEsUser: admin
-  loggingEsPass: admin
-  prodEsEndpoint: https://easysearch-0.easysearch:9200
-  prodEsUser: admin
-  prodEsPass: admin
+  # Default values for loggingEsEndpoint, don't setting to empty
+  loggingEsEndpoint: "https://easysearch-0.easysearch:9200"
+  # Default values for loggingEsUser, setting to empty when no credentials
+  loggingEsUser: ""
+  # Default values for loggingEsPass, setting to empty when no credentials
+  loggingEsPass: ""
+  # Default values for prodEsEndpoint, don't setting to empty
+  prodEsEndpoint: "https://easysearch-0.easysearch:9200"
+  # Default values for prodEsUser, setting to empty when no credentials
+  prodEsUser: ""
+  # Default values for prodEsPass, setting to empty when no credentials
+  prodEsPass: ""
 
 replicaCount: 1
 
