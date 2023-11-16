@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "console.fullname" . }}-security-yml
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+data:
+  security.yml: |
+    security:
+      enabled: true
+      oauth:
+        enabled: false
+---
