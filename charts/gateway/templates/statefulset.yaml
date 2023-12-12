@@ -47,9 +47,18 @@ spec:
               value: {{ .Values.env.prodEsUser }}
             - name: PROD_ES_PASS
               value: {{ .Values.env.prodEsPass }}
+            - name: GW_BINDING
+              value: "{{ .Values.env.bindIP }}:{{ .Values.service.httpPort }}"
+            - name: AGENT_GW_BINDING
+              value: "{{ .Values.env.bindIP }}:{{ .Values.service.httpAgentPort }}"
+            - name: API_BINDING
+              value: "{{ .Values.env.bindIP }}:{{ .Values.service.apiPort }}"
           ports:
             - name: http
               containerPort: {{ .Values.service.httpPort }}
+              protocol: TCP
+            - name: http-agent
+              containerPort: {{ .Values.service.httpAgentPort }}
               protocol: TCP
             - name: api
               containerPort: {{ .Values.service.apiPort }}
@@ -60,6 +69,9 @@ spec:
             - name: gateway-config
               mountPath: gateway.yml
               subPath: gateway.yml
+            - name: gateway-agent-config
+              mountPath: /config/agent.yml
+              subPath: agent.yml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -72,6 +84,13 @@ spec:
             items: 
               - key: gateway.yml
                 path: gateway.yml
+        - name: gateway-agent-config
+          configMap:
+            name: {{ include "gateway.fullname" . }}-agent-config
+            defaultMode: 420
+            items: 
+              - key: agent.yml
+                path: agent.yml        
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -12,7 +12,7 @@ image:
   repository: infinilabs/easysearch
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "1.6.2-222"
 
 imagePullSecrets: []
 nameOverride: ""

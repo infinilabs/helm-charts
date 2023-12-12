@@ -6,15 +6,17 @@ env:
   # Default values for loggingEsEndpoint, don't setting to empty
   loggingEsEndpoint: "https://easysearch-0.easysearch:9200"
   # Default values for loggingEsUser, setting to empty when no credentials
-  loggingEsUser: ""
+  loggingEsUser: "admin"
   # Default values for loggingEsPass, setting to empty when no credentials
-  loggingEsPass: ""
+  loggingEsPass: "admin"
   # Default values for prodEsEndpoint, don't setting to empty
   prodEsEndpoint: "https://easysearch-0.easysearch:9200"
   # Default values for prodEsUser, setting to empty when no credentials
-  prodEsUser: ""
+  prodEsUser: "admin"
   # Default values for prodEsPass, setting to empty when no credentials
-  prodEsPass: ""
+  prodEsPass: "admin"
+  # Default values for gateway listened ip
+  bindIP: "0.0.0.0"
 
 replicaCount: 1
 
@@ -22,7 +24,7 @@ image:
   repository: infinilabs/gateway
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "1.20.0-1200"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -53,6 +55,7 @@ securityContext: {}
 service:
   type: ClusterIP
   httpPort: 8000
+  httpAgentPort: 8001
   apiPort: 2900
   httpNodeport: 30800
   apiNodeport: 30290
@@ -100,3 +103,361 @@ affinity: {}
 
 storageClassName: local-path
 dataVolumeStorage: 100Gi
+
+gateway_file_content:
+  path.data: data
+  path.logs: log
+  path.configs: config
+  configs.auto_reload: false
+
+  stats:
+    enabled: true
+    persist: true
+    no_buffer: true
+    buffer_size: 1000
+    flush_interval_ms: 1000
+  
+  api:
+    enabled: true
+    network:
+      binding: "$[[env.API_BINDING]]"
+  
+  elasticsearch:
+    - name: prod
+      enabled: true
+      endpoints:
+        - $[[env.PROD_ES_ENDPOINT]]
+      discovery:
+        enabled: false
+      basic_auth:
+        username: $[[env.PROD_ES_USER]]
+        password: $[[env.PROD_ES_PASS]]
+      traffic_control.max_bytes_per_node: 1010485760
+      metadata_cache_enabled: false
+    - name: logging-server
+      enabled: true
+      endpoints:
+        - $[[env.LOGGING_ES_ENDPOINT]]
+      basic_auth:
+        username: $[[env.LOGGING_ES_USER]]
+        password: $[[env.LOGGING_ES_PASS]]
+      discovery:
+        enabled: false
+  
+  entry:
+    - name: my_es_entry
+      enabled: true
+      router: my_router
+      max_concurrency: 10000
+      network:
+        binding: "$[[env.GW_BINDING]]"
+        reuse_port: true
+  
+  router:
+    - name: my_router
+      default_flow: default_flow
+      tracing_flow: logging_flow
+      rules:
+        - method:
+            - "*"
+          pattern:
+            - "/_bulk"
+            - "/{any_index}/_bulk"
+          flow:
+            - async_bulk_flow
+  
+  flow:
+    - name: default_flow
+      filter:
+        - elasticsearch:
+            elasticsearch: prod
+            max_connection_per_node: 1000
+    - name: logging_flow
+      filter:
+        - logging:
+            queue_name: request_logging
+            max_request_body_size: 4096
+            max_response_body_size: 4096
+    #        when: #>1s or none-200 requests will be logged
+    #         or:
+    #           - not:
+    #               or:
+    #                 - equals:
+    #                     _ctx.request.path: "/favicon.ico"
+    #                 - in:
+    #                     _ctx.response.status: [404,200,201]
+    #                 - suffix:
+    #                     _ctx.request.path: ".js"
+    #                 - suffix:
+    #                     _ctx.request.path: ".css"
+    #           - range:
+    #               _ctx.elapsed.gte: 1000
+    - name: async_bulk_flow
+      filter:
+        - bulk_reshuffle:
+            when:
+              contains:
+                _ctx.request.path: /_bulk
+            elasticsearch: prod
+            level: node
+            partition_size: 10
+            continue_metadata_missing: true
+            fix_null_id: true
+        - elasticsearch:
+            elasticsearch: prod
+            max_connection_per_node: 1000
+  
+  pipeline:
+    - name: pipeline_logging_merge
+      auto_start: true
+      keep_running: true
+      processor:
+        - indexing_merge:
+            input_queue: "logging"
+            idle_timeout_in_seconds: 1
+            elasticsearch: "logging-server"
+            index_name: ".infini_logs"
+            output_queue:
+              name: "gateway-pipeline-logs"
+              label:
+                tag: "pipeline_logging"
+            worker_size: 1
+            bulk_size_in_kb: 1
+    - name: ingest_pipeline_logging
+      auto_start: true
+      keep_running: true
+      processor:
+        - bulk_indexing:
+            bulk:
+              compress: true
+              batch_size_in_mb: 1
+              batch_size_in_docs: 1
+            consumer:
+              fetch_max_messages: 100
+            queues:
+              type: indexing_merge
+              tag: "pipeline_logging"
+    - name: async_messages_merge
+      auto_start: true
+      keep_running: true
+      processor:
+        - indexing_merge:
+            input_queue: "bulk_result_messages"
+            elasticsearch: "logging-server"
+            index_name: ".infini_async_bulk_results"
+            output_queue:
+              name: "bulk_requests"
+              label:
+                tag: "bulk_logging"
+            worker_size: 1
+            bulk_size_in_mb: 10
+    - name: metrics_merge
+      auto_start: true
+      keep_running: true
+      processor:
+        - indexing_merge:
+            input_queue: "metrics"
+            elasticsearch: "logging-server"
+            index_name: ".infini_metrics"
+            output_queue:
+              name: "bulk_requests"
+              label:
+                tag: "metrics"
+            worker_size: 1
+            bulk_size_in_mb: 10
+    - name: request_logging_merge
+      auto_start: true
+      keep_running: true
+      processor:
+        - indexing_merge:
+            input_queue: "request_logging"
+            elasticsearch: "logging-server"
+            index_name: ".infini_requests_logging"
+            output_queue:
+              name: "bulk_requests"
+              label:
+                tag: "request_logging"
+            worker_size: 1
+            bulk_size_in_mb: 10
+    - name: ingest_merged_requests
+      auto_start: true
+      keep_running: true
+      processor:
+        - bulk_indexing:
+            num_of_slices: 3
+            bulk:
+              compress: false
+              batch_size_in_mb: 10
+              batch_size_in_docs: 500
+              invalid_queue: "invalid_request"
+              response_handle:
+                bulk_result_message_queue: "system_failure_messages"
+                max_request_body_size: 10240
+                max_response_body_size: 10240
+                save_success_results: false
+                max_error_details_count: 5
+            consumer:
+              fetch_max_messages: 100
+            queues:
+              type: indexing_merge
+            when:
+              cluster_available: ["logging-server"]
+    - name: async_ingest_bulk_requests
+      auto_start: true
+      keep_running: true
+      retry_delay_in_ms: 1000
+      processor:
+        - bulk_indexing:
+            max_connection_per_node: 1000
+            num_of_slices: 2 
+            max_worker_size: 200
+            idle_timeout_in_seconds: 10
+            bulk:
+              compress: false
+              batch_size_in_mb: 20
+              batch_size_in_docs: 5000
+              invalid_queue: "bulk_invalid_requests"
+              dead_letter_queue: "bulk_dead_requests"
+              response_handle:
+                bulk_result_message_queue: "bulk_result_messages"
+                max_request_body_size: 1024
+                max_response_body_size: 1024
+                save_success_results: true
+                max_error_details_count: 5
+                retry_rules:
+                  default: true
+                  retry_429: true
+                  retry_4xx: false
+                  denied:
+                    status: []
+                    keyword:
+                      - illegal_state_exception
+            consumer:
+              fetch_max_messages: 100
+              eof_retry_delay_in_ms: 500
+            queue_selector:
+              labels:
+                type: bulk_reshuffle
+  
+  metrics:
+    enabled: true
+    queue: metrics
+    logging_queue: logging
+    instance:
+      enabled: true
+    network:
+      enabled: true
+      summary: true
+      sockets: true
+  
+  disk_queue:
+    prepare_files_to_read: true
+    eof_retry_delay_in_ms: 500
+    cleanup_files_on_init: false
+    retention:
+      max_num_of_local_files: 20 
+    compress:
+      segment:
+        enabled: true
+      delete_after_compress: true
+      idle_threshold: 20
+  
+  badger:
+    single_bucket_mode: true
+    path: '' 
+    memory_mode: false 
+    sync_writes: false 
+    mem_table_size: 10485760
+    num_mem_tables: 1
+    value_log_max_entries: 1000000
+    value_log_file_size: 536870912
+    value_threshold: 1048576
+    num_level0_tables: 1
+    num_level0_tables_stall: 2
+  
+  elastic:
+    elasticsearch: prod
+    enabled: true
+    remote_configs: false
+    health_check:
+      enabled: true
+      interval: 30s
+    availability_check:
+      enabled: true
+      interval: 30s
+    metadata_refresh:
+      enabled: true
+      interval: 60s
+    cluster_settings_check:
+      enabled: false
+      interval: 60s
+
+agent_file_content:
+  entry:
+    - name: agent_es_entry
+      enabled: true
+      router: agent_router
+      max_concurrency: 200000
+      network:
+        binding: "0.0.0.0:8001"
+
+  flow:
+    - name: deny_flow
+      filter:
+        - set_response:
+            body: "request not allowed"
+            status: 500
+    - name: ingest_flow
+      filter:
+        - basic_auth:
+            valid_users:
+              ingest: password
+        - rewrite_to_bulk:
+            type_removed: false
+        - bulk_request_mutate:
+            fix_null_id: true
+            generate_enhanced_id: true
+            index_rename:
+              metrics: ".infini_metrics"
+              logs: ".infini_logs"
+        - bulk_reshuffle:
+            when:
+              contains:
+                _ctx.request.path: /_bulk
+            elasticsearch: prod
+            level: node
+            partition_size: 1
+            fix_null_id: true
+
+  router:
+    - name: agent_router
+      default_flow: deny_flow
+      rules:
+        - method:
+            - "POST"
+          enabled: true
+          pattern:
+            - "/{any_index}/_doc/"
+          flow:
+            - ingest_flow
+
+  pipeline:
+    - name: bulk_request_ingest
+      auto_start: true
+      keep_running: true
+      retry_delay_in_ms: 1000
+      processor:
+        - bulk_indexing:
+            max_connection_per_node: 100
+            num_of_slices: 3
+            max_worker_size: 30
+            idle_timeout_in_seconds: 10
+            bulk:
+              compress: false
+              batch_size_in_mb: 10
+              batch_size_in_docs: 10000
+            consumer:
+              fetch_max_messages: 100
+            queue_selector:
+              labels:
+                type: bulk_reshuffle
