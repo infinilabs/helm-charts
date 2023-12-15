@@ -10,6 +10,7 @@ data:
       {{- toYaml . | nindent 4 }}
     {{- end  }}
 ---
+{{- if .Values.agent_file_content }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,3 +22,5 @@ data:
     {{- with .Values.agent_file_content }}
       {{- toYaml . | nindent 4 }}
     {{- end  }}
+---
+{{- end }}

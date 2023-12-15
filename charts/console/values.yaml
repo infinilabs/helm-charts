@@ -8,7 +8,7 @@ image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.12.0-1334"
+  tag: "1.13.0-1350"
 
 imagePullSecrets: []
 nameOverride: ""

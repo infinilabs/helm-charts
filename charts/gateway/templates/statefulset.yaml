@@ -69,9 +69,11 @@ spec:
             - name: gateway-config
               mountPath: gateway.yml
               subPath: gateway.yml
+            {{- if .Values.agent_file_content }}
             - name: gateway-agent-config
               mountPath: /config/agent.yml
               subPath: agent.yml
+            {{- end}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -84,13 +86,15 @@ spec:
             items: 
               - key: gateway.yml
                 path: gateway.yml
+        {{- if .Values.agent_file_content }}
         - name: gateway-agent-config
           configMap:
             name: {{ include "gateway.fullname" . }}-agent-config
             defaultMode: 420
             items: 
               - key: agent.yml
-                path: agent.yml        
+                path: agent.yml
+        {{- end}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
