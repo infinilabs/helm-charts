@@ -1,4 +1,4 @@
-# **Infinilabs Helm Charts**
+# **INFINI Labs Helm Charts**
 
 ## Usage
 
