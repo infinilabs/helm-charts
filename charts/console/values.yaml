@@ -8,7 +8,7 @@ image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.14.0-1366"
+  tag: "1.24.0-1488"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -37,7 +37,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 9000
   nodeport: 30900
 
