@@ -24,7 +24,7 @@ image:
   repository: infinilabs/gateway
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.21.0-1229"
+  tag: "1.24.0-1328"
 
 imagePullSecrets: []
 nameOverride: ""
