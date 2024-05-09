@@ -46,6 +46,8 @@ spec:
               value: '{{- toString .Values.discoverySeedHosts }}'
             - name: NODE_ROLES
               value: '{{- toString .Values.nodeRoles }}'
+            - name: JAVA_OPTS
+              value: '{{- toString .Values.javaOpts }}'
           command: ['/sbin/unitMGR']
           volumeMounts:
             - name: easysearch-config
@@ -61,7 +63,7 @@ spec:
               subPath: instance.key
             - name: easysearch-confd-toml
               mountPath: /tmp/confd/conf.d
-            - name: easysearch-confd-tmpl
+            - name: easysearch-config-tmp
               mountPath: /tmp/confd/templates
             - name: easysearch-config-script
               mountPath: /sbin/unitMGR
@@ -112,9 +114,9 @@ spec:
           configMap:
             name: {{ include "easysearch.fullname" . }}-confd-toml
             defaultMode: 420
-        - name: easysearch-confd-tmpl
+        - name: easysearch-config-tmp
           configMap:
-            name: {{ include "easysearch.fullname" . }}-confd-tmpl
+            name: {{ include "easysearch.fullname" . }}-config-tmp
             defaultMode: 420
         - name: easysearch-tls
           secret:
