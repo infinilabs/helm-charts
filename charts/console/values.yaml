@@ -3,13 +3,17 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
 image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.24.0-1488"
 
+debug:
+  enabled: false
+  command: [/console-linux-amd64]
+  args: ["-debug"]
+  
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
