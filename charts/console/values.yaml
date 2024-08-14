@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
 image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
