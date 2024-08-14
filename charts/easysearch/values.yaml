@@ -8,12 +8,13 @@ masterHosts: '"easysearch-0"'
 discoverySeedHosts: '"easysearch-0.easysearch"'
 nodeRoles: '"master","data","ingest","remote_cluster_client"'
 javaOpts: '-Xms1g -Xmx1g'
+initAdminPassword: "YOUR_INIT_ADMIN_PASSWORD"
 
 image:
   repository: infinilabs/easysearch
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.7.1-226"
+  tag: "1.8.3-265"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -28,14 +29,14 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
-
 podSecurityContext:
   runAsUser: 602
   runAsGroup: 602
   fsGroup: 602
   fsGroupChangePolicy: "OnRootMismatch"
   # fsGroup: 2000
+
+podAnnotations: {}
 
 security:
   enabled: true
@@ -90,7 +91,6 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
@@ -99,4 +99,4 @@ tolerations: []
 affinity: {}
 
 storageClassName: local-path
-dataVolumeStorage: 100Gi
+dataVolumeStorage: 200Gi

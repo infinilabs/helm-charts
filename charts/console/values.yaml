@@ -8,8 +8,13 @@ image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.24.0-1488"
+  tag: "1.26.1-1623"
 
+debug:
+  enabled: false
+  command: [/console-linux-amd64]
+  args: ["-debug"]
+  
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -90,7 +95,7 @@ security_file_content:
   security:
     enabled: true
     oauth:
-      enabled: false
+      enabled: true
       #only support github now
       authorize_url: "https://github.com/login/oauth/authorize"
       token_url: "https://github.com/login/oauth/access_token"

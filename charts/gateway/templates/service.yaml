@@ -9,9 +9,11 @@ spec:
     {{- include "gateway.selectorLabels" . | nindent 4 }}
   type: {{ .Values.service.type }}
   ports:
+    {{- if .Values.agent_file_content }}
     - name: http-agent
       port: {{ .Values.service.httpAgentPort }}
       protocol: TCP
+    {{- end}}
     - name: http
       port: {{ .Values.service.httpPort }}
       {{- if eq .Values.service.type "NodePort" }}

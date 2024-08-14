@@ -3,20 +3,17 @@
 # Declare variables to be passed into your templates.
 
 env:
-  # Default values for loggingEsEndpoint, don't setting to empty
-  loggingEsEndpoint: "https://easysearch-0.easysearch:9200"
-  # Default values for loggingEsUser, setting to empty when no credentials
-  loggingEsUser: "admin"
-  # Default values for loggingEsPass, setting to empty when no credentials
-  loggingEsPass: "admin"
-  # Default values for prodEsEndpoint, don't setting to empty
-  prodEsEndpoint: "https://easysearch-0.easysearch:9200"
-  # Default values for prodEsUser, setting to empty when no credentials
-  prodEsUser: "admin"
-  # Default values for prodEsPass, setting to empty when no credentials
-  prodEsPass: "admin"
-  # Default values for gateway listened ip
-  bindIP: "0.0.0.0"
+  loggingEsEndpoint: http://easysearch-0.easysearch:9200
+  loggingEsUser: admin
+  loggingEsPass: YOUR_INIT_ADMIN_PASSWORD
+  prodEsEndpoint: http://easysearch-0.easysearch:9200
+  prodEsUser: admin
+  prodEsPass: YOUR_INIT_ADMIN_PASSWORD
+
+debug:
+  enabled: false
+  command: [/gateway-linux-amd64]
+  args: ["-debug"]
 
 replicaCount: 1
 
@@ -24,7 +21,7 @@ image:
   repository: infinilabs/gateway
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.24.0-1328"
+  tag: "1.26.1-1491"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -67,16 +64,10 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: gateway.local
+    - host: chart-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
-          port: 8000
-    - host: gateway-agent.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-          port: 8001
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -88,11 +79,11 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 2000m
-    memory: 4Gi
+    cpu: 8000m
+    memory: 16Gi
   requests:
-    cpu: 2000m
-    memory: 4Gi
+    cpu: 4000m
+    memory: 8Gi
 
 autoscaling:
   enabled: false
@@ -108,7 +99,7 @@ tolerations: []
 affinity: {}
 
 storageClassName: local-path
-dataVolumeStorage: 100Gi
+dataVolumeStorage: 200Gi
 
 gateway_file_content:
   path.data: data
@@ -417,7 +408,7 @@ agent_file_content:
       filter:
         - basic_auth:
             valid_users:
-              ingest: password
+              your_ingest_user: your_ingest_password
         - rewrite_to_bulk:
             type_removed: false
         - bulk_request_mutate:
@@ -446,24 +437,3 @@ agent_file_content:
             - "/{any_index}/_doc/"
           flow:
             - ingest_flow
-
-  pipeline:
-    - name: bulk_request_ingest
-      auto_start: true
-      keep_running: true
-      retry_delay_in_ms: 1000
-      processor:
-        - bulk_indexing:
-            max_connection_per_node: 100
-            num_of_slices: 3
-            max_worker_size: 30
-            idle_timeout_in_seconds: 10
-            bulk:
-              compress: false
-              batch_size_in_mb: 10
-              batch_size_in_docs: 10000
-            consumer:
-              fetch_max_messages: 100
-            queue_selector:
-              labels:
-                type: bulk_reshuffle

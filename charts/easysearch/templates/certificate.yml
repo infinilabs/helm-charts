@@ -4,7 +4,7 @@ metadata:
   name: {{ include "easysearch.fullname" . }}-instance-certificate
 spec:
   dnsNames:
-  - infini.cloud
+  - infinilabs.com
   duration: 87600h0m0s
   issuerRef:
     kind: Issuer

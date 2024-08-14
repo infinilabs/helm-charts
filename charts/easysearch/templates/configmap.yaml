@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "easysearch.fullname" . }}-confd-toml
+  name: {{ include "easysearch.fullname" . }}-config-toml
   labels:
     {{- include "easysearch.labels" . | nindent 4 }}
 data:
@@ -17,7 +17,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "easysearch.fullname" . }}-config-tmp
+  name: {{ include "easysearch.fullname" . }}-config-tmpl
   labels:
     {{- include "easysearch.labels" . | nindent 4 }}
 data:
@@ -41,13 +41,13 @@ data:
     #bootstrap.system_call_filter: false
     #elasticsearch.api_compatibility: true
     
-    security.enabled: true
+    security.enabled: false
     security.audit.type: noop
     security.ssl.transport.cert_file: instance.crt
     security.ssl.transport.key_file: instance.key
     security.ssl.transport.ca_file: ca.crt
     security.ssl.transport.skip_domain_verify: true
-    security.ssl.http.enabled: true
+    security.ssl.http.enabled: false
     security.ssl.http.cert_file: instance.crt
     security.ssl.http.key_file: instance.key
     security.ssl.http.ca_file: ca.crt
@@ -66,7 +66,6 @@ data:
     security.allow_default_init_securityindex: true
     
     security.nodes_dn:
-      #- 'CN=infini.cloud,OU=UNIT,O=ORG,L=NI,ST=FI,C=IN'
       - 'O=infinilabs'
     
     security.restapi.roles_enabled: [ "superuser", "security_rest_api_access" ]
@@ -79,7 +78,6 @@ data:
     ## specify admin certs to operate against system indices, basic_auth is not required
     ##  curl -k  --cert config/admin.crt --key config/admin.key   -XDELETE 'https://localhost:9200/.infini-*/'
     security.authcz.admin_dn:
-      #- 'CN=admin.infini.cloud,OU=UNIT,O=ORG,L=NI,ST=FI,C=IN'
       - 'O=infinilabs'
   jvm.options: |-
     ## JVM configuration
@@ -166,15 +164,187 @@ data:
 
     # JDK 9+ GC logging
     9-:-Xlog:gc*,gc+age=trace,safepoint:file=logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "easysearch.fullname" . }}-init-script
-  labels:
-    {{- include "easysearch.labels" . | nindent 4 }}
-data:
-  initialize.sh: |
+  log4j2.options: |-
+    status=error
+    appender.console.type=Console
+    appender.console.name=console
+    appender.console.layout.type=PatternLayout
+    appender.console.layout.pattern=[%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker %m%n
+    ######## Server JSON ############################
+    appender.rolling.type=RollingFile
+    appender.rolling.name=rolling
+    appender.rolling.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}_server.json
+    appender.rolling.layout.type=ESJsonLayout
+    appender.rolling.layout.type_name=server
+    appender.rolling.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}-%d{yyyy-MM-dd}-%i.json.gz
+    appender.rolling.policies.type=Policies
+    appender.rolling.policies.time.type=TimeBasedTriggeringPolicy
+    appender.rolling.policies.time.interval=1
+    appender.rolling.policies.time.modulate=true
+    appender.rolling.policies.size.type=SizeBasedTriggeringPolicy
+    appender.rolling.policies.size.size=128MB
+    appender.rolling.strategy.type=DefaultRolloverStrategy
+    appender.rolling.strategy.fileIndex=nomax
+    appender.rolling.strategy.action.type=Delete
+    appender.rolling.strategy.action.basepath=${sys:es.logs.base_path}
+    appender.rolling.strategy.action.condition.type=IfFileName
+    appender.rolling.strategy.action.condition.glob=${sys:es.logs.cluster_name}-*
+    appender.rolling.strategy.action.condition.nested_condition.type=IfAccumulatedFileSize
+    appender.rolling.strategy.action.condition.nested_condition.exceeds=2GB
+    ################################################
+    ######## Server -  old style pattern ###########
+    appender.rolling_old.type=RollingFile
+    appender.rolling_old.name=rolling_old
+    appender.rolling_old.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}.log
+    appender.rolling_old.layout.type=PatternLayout
+    appender.rolling_old.layout.pattern=[%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker %m%n
+    appender.rolling_old.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}-%d{yyyy-MM-dd}-%i.log.gz
+    appender.rolling_old.policies.type=Policies
+    appender.rolling_old.policies.time.type=TimeBasedTriggeringPolicy
+    appender.rolling_old.policies.time.interval=1
+    appender.rolling_old.policies.time.modulate=true
+    appender.rolling_old.policies.size.type=SizeBasedTriggeringPolicy
+    appender.rolling_old.policies.size.size=128MB
+    appender.rolling_old.strategy.type=DefaultRolloverStrategy
+    appender.rolling_old.strategy.fileIndex=nomax
+    appender.rolling_old.strategy.action.type=Delete
+    appender.rolling_old.strategy.action.basepath=${sys:es.logs.base_path}
+    appender.rolling_old.strategy.action.condition.type=IfFileName
+    appender.rolling_old.strategy.action.condition.glob=${sys:es.logs.cluster_name}-*
+    appender.rolling_old.strategy.action.condition.nested_condition.type=IfAccumulatedFileSize
+    appender.rolling_old.strategy.action.condition.nested_condition.exceeds=2GB
+    ################################################
+    rootLogger.level=info
+    rootLogger.appenderRef.console.ref=console
+    rootLogger.appenderRef.rolling.ref=rolling
+    rootLogger.appenderRef.rolling_old.ref=rolling_old
+    ######## Deprecation JSON #######################
+    appender.deprecation_rolling.type=RollingFile
+    appender.deprecation_rolling.name=deprecation_rolling
+    appender.deprecation_rolling.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}_deprecation.json
+    appender.deprecation_rolling.layout.type=ESJsonLayout
+    appender.deprecation_rolling.layout.type_name=deprecation
+    appender.deprecation_rolling.layout.esmessagefields=x-opaque-id
+    appender.deprecation_rolling.filter.rate_limit.type=RateLimitingFilter
+    appender.deprecation_rolling.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}_deprecation-%i.json.gz
+    appender.deprecation_rolling.policies.type=Policies
+    appender.deprecation_rolling.policies.size.type=SizeBasedTriggeringPolicy
+    appender.deprecation_rolling.policies.size.size=1GB
+    appender.deprecation_rolling.strategy.type=DefaultRolloverStrategy
+    appender.deprecation_rolling.strategy.max=4
+    appender.header_warning.type=HeaderWarningAppender
+    appender.header_warning.name=header_warning
+    #################################################
+    ######## Deprecation -  old style pattern #######
+    appender.deprecation_rolling_old.type=RollingFile
+    appender.deprecation_rolling_old.name=deprecation_rolling_old
+    appender.deprecation_rolling_old.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}_deprecation.log
+    appender.deprecation_rolling_old.layout.type=PatternLayout
+    appender.deprecation_rolling_old.layout.pattern=[%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker %m%n
+    appender.deprecation_rolling_old.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _deprecation-%i.log.gz
+    appender.deprecation_rolling_old.policies.type=Policies
+    appender.deprecation_rolling_old.policies.size.type=SizeBasedTriggeringPolicy
+    appender.deprecation_rolling_old.policies.size.size=1GB
+    appender.deprecation_rolling_old.strategy.type=DefaultRolloverStrategy
+    appender.deprecation_rolling_old.strategy.max=4
+    #################################################
+    logger.deprecation.name=org.easysearch.deprecation
+    logger.deprecation.level=deprecation
+    logger.deprecation.appenderRef.deprecation_rolling.ref=deprecation_rolling
+    logger.deprecation.appenderRef.deprecation_rolling_old.ref=deprecation_rolling_old
+    logger.deprecation.appenderRef.header_warning.ref=header_warning
+    logger.deprecation.additivity=false
+    ######## Search slowlog JSON ####################
+    appender.index_search_slowlog_rolling.type=RollingFile
+    appender.index_search_slowlog_rolling.name=index_search_slowlog_rolling
+    appender.index_search_slowlog_rolling.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs\
+      .cluster_name}_index_search_slowlog.json
+    appender.index_search_slowlog_rolling.layout.type=ESJsonLayout
+    appender.index_search_slowlog_rolling.layout.type_name=index_search_slowlog
+    appender.index_search_slowlog_rolling.layout.esmessagefields=message,took,took_millis,total_hits,types,stats,search_type,total_shards,source,id
+    appender.index_search_slowlog_rolling.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs\
+      .cluster_name}_index_search_slowlog-%i.json.gz
+    appender.index_search_slowlog_rolling.policies.type=Policies
+    appender.index_search_slowlog_rolling.policies.size.type=SizeBasedTriggeringPolicy
+    appender.index_search_slowlog_rolling.policies.size.size=1GB
+    appender.index_search_slowlog_rolling.strategy.type=DefaultRolloverStrategy
+    appender.index_search_slowlog_rolling.strategy.max=4
+    #################################################
+    ######## Search slowlog -  old style pattern ####
+    appender.index_search_slowlog_rolling_old.type=RollingFile
+    appender.index_search_slowlog_rolling_old.name=index_search_slowlog_rolling_old
+    appender.index_search_slowlog_rolling_old.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _index_search_slowlog.log
+    appender.index_search_slowlog_rolling_old.layout.type=PatternLayout
+    appender.index_search_slowlog_rolling_old.layout.pattern=[%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker %m%n
+    appender.index_search_slowlog_rolling_old.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _index_search_slowlog-%i.log.gz
+    appender.index_search_slowlog_rolling_old.policies.type=Policies
+    appender.index_search_slowlog_rolling_old.policies.size.type=SizeBasedTriggeringPolicy
+    appender.index_search_slowlog_rolling_old.policies.size.size=1GB
+    appender.index_search_slowlog_rolling_old.strategy.type=DefaultRolloverStrategy
+    appender.index_search_slowlog_rolling_old.strategy.max=4
+    #################################################
+    logger.index_search_slowlog_rolling.name=index.search.slowlog
+    logger.index_search_slowlog_rolling.level=trace
+    logger.index_search_slowlog_rolling.appenderRef.index_search_slowlog_rolling.ref=index_search_slowlog_rolling
+    logger.index_search_slowlog_rolling.appenderRef.index_search_slowlog_rolling_old.ref=index_search_slowlog_rolling_old
+    logger.index_search_slowlog_rolling.additivity=false
+    ######## Indexing slowlog JSON ##################
+    appender.index_indexing_slowlog_rolling.type=RollingFile
+    appender.index_indexing_slowlog_rolling.name=index_indexing_slowlog_rolling
+    appender.index_indexing_slowlog_rolling.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _index_indexing_slowlog.json
+    appender.index_indexing_slowlog_rolling.layout.type=ESJsonLayout
+    appender.index_indexing_slowlog_rolling.layout.type_name=index_indexing_slowlog
+    appender.index_indexing_slowlog_rolling.layout.esmessagefields=message,took,took_millis,doc_type,id,routing,source
+    appender.index_indexing_slowlog_rolling.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _index_indexing_slowlog-%i.json.gz
+    appender.index_indexing_slowlog_rolling.policies.type=Policies
+    appender.index_indexing_slowlog_rolling.policies.size.type=SizeBasedTriggeringPolicy
+    appender.index_indexing_slowlog_rolling.policies.size.size=1GB
+    appender.index_indexing_slowlog_rolling.strategy.type=DefaultRolloverStrategy
+    appender.index_indexing_slowlog_rolling.strategy.max=4
+    #################################################
+    ######## Indexing slowlog -  old style pattern ##
+    appender.index_indexing_slowlog_rolling_old.type=RollingFile
+    appender.index_indexing_slowlog_rolling_old.name=index_indexing_slowlog_rolling_old
+    appender.index_indexing_slowlog_rolling_old.fileName=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _index_indexing_slowlog.log
+    appender.index_indexing_slowlog_rolling_old.layout.type=PatternLayout
+    appender.index_indexing_slowlog_rolling_old.layout.pattern=[%d{ISO8601}][%-5p][%-25c{1.}] [%node_name]%marker %m%n
+    appender.index_indexing_slowlog_rolling_old.filePattern=${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}\
+      _index_indexing_slowlog-%i.log.gz
+    appender.index_indexing_slowlog_rolling_old.policies.type=Policies
+    appender.index_indexing_slowlog_rolling_old.policies.size.type=SizeBasedTriggeringPolicy
+    appender.index_indexing_slowlog_rolling_old.policies.size.size=1GB
+    appender.index_indexing_slowlog_rolling_old.strategy.type=DefaultRolloverStrategy
+    appender.index_indexing_slowlog_rolling_old.strategy.max=4
+    #################################################
+    logger.index_indexing_slowlog.name=index.indexing.slowlog.index
+    logger.index_indexing_slowlog.level=trace
+    logger.index_indexing_slowlog.appenderRef.index_indexing_slowlog_rolling.ref=index_indexing_slowlog_rolling
+    logger.index_indexing_slowlog.appenderRef.index_indexing_slowlog_rolling_old.ref=index_indexing_slowlog_rolling_old
+    logger.index_indexing_slowlog.additivity=false
+
+    logger.io_netty.name = io.netty
+    logger.io_netty.level = error
+
+    logger.com_amazonaws.name = com.amazonaws
+    logger.com_amazonaws.level = error
+
+    logger.com_amazonaws_jmx_SdkMBeanRegistrySupport.name = com.amazonaws.jmx.SdkMBeanRegistrySupport
+    logger.com_amazonaws_jmx_SdkMBeanRegistrySupport.level = error
+
+    logger.com_amazonaws_metrics_AwsSdkMetrics.name = com.amazonaws.metrics.AwsSdkMetrics
+    logger.com_amazonaws_metrics_AwsSdkMetrics.level = error
+
+    logger.com_amazonaws_auth_profile_internal_BasicProfileConfigFileLoader.name = com.amazonaws.auth.profile.internal.BasicProfileConfigFileLoader
+    logger.com_amazonaws_auth_profile_internal_BasicProfileConfigFileLoader.level = error
+
+    logger.com_amazonaws_services_s3_internal_UseArnRegionResolver.name = com.amazonaws.services.s3.internal.UseArnRegionResolver
+    logger.com_amazonaws_services_s3_internal_UseArnRegionResolver.level = error
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -190,13 +360,13 @@ data:
     cp -r /app/easysearch/config/* /etc/confd/
     
     cat /tmp/confd/templates/jvm.options > /etc/confd/jvm.options
-    for opt in $(echo ${JAVA_OPTS})
-    do
+    for opt in $(echo ${JAVA_OPTS}); do
       sed -i 's/'"${opt:0:4}"'1g/'"${opt}"'/' /etc/confd/jvm.options
     done
+    cat /tmp/confd/templates/log4j2.options > /etc/confd/log4j2.options
     
     mkdir /etc/confd/{conf.d,templates}
     cat /tmp/confd/conf.d/confd.toml > /etc/confd/conf.d/confd.toml
     cat /tmp/confd/templates/confd.tmpl > /etc/confd/templates/confd.tmpl
     sed -ir 's/\\//g' /etc/confd/templates/confd.tmpl
-    /sbin/confd -onetime -backend=env
+    /sbin/confd -onetime -backend=env -log-level error
