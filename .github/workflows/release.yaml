@@ -1,8 +1,8 @@
 name: "Release Charts"
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -24,11 +24,11 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
         env:
-          GITHUB_TOKEN: "${{ secrets.TK_GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
           charts_dir: charts
         env:
-          CR_TOKEN: "${{ secrets.TK_GITHUB_TOKEN }}"
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

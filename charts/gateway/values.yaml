@@ -92,14 +92,19 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector: {}
+nodeSelector:
+  cloud.infinilabs.com/nodepool: easysearch-node-pool
 
-tolerations: []
+tolerations:
+- key: "dedicated"
+  operator: "Equal"
+  value: "noschedule"
+  effect: "NoSchedule"
 
 affinity: {}
 
-storageClassName: local-path
-dataVolumeStorage: 200Gi
+storageClassName: openebs-hostpath
+dataVolumeStorage: 40Gi
 
 gateway_file_content:
   path.data: data
@@ -113,12 +118,12 @@ gateway_file_content:
     no_buffer: true
     buffer_size: 1000
     flush_interval_ms: 1000
-  
+
   api:
     enabled: true
     network:
       binding: "$[[env.API_BINDING]]"
-  
+
   elasticsearch:
     - name: prod
       enabled: true
@@ -140,7 +145,7 @@ gateway_file_content:
         password: $[[env.LOGGING_ES_PASS]]
       discovery:
         enabled: false
-  
+
   entry:
     - name: my_es_entry
       enabled: true
@@ -149,7 +154,7 @@ gateway_file_content:
       network:
         binding: "$[[env.GW_BINDING]]"
         reuse_port: true
-  
+
   router:
     - name: my_router
       default_flow: default_flow
@@ -162,7 +167,7 @@ gateway_file_content:
             - "/{any_index}/_bulk"
           flow:
             - async_bulk_flow
-  
+
   flow:
     - name: default_flow
       filter:
@@ -203,7 +208,7 @@ gateway_file_content:
         - elasticsearch:
             elasticsearch: prod
             max_connection_per_node: 1000
-  
+
   pipeline:
     - name: pipeline_logging_merge
       auto_start: true
@@ -306,7 +311,7 @@ gateway_file_content:
       processor:
         - bulk_indexing:
             max_connection_per_node: 1000
-            num_of_slices: 2 
+            num_of_slices: 2
             max_worker_size: 200
             idle_timeout_in_seconds: 10
             bulk:
@@ -335,7 +340,7 @@ gateway_file_content:
             queue_selector:
               labels:
                 type: bulk_reshuffle
-  
+
   metrics:
     enabled: true
     queue: metrics
@@ -346,24 +351,24 @@ gateway_file_content:
       enabled: true
       summary: true
       sockets: true
-  
+
   disk_queue:
     prepare_files_to_read: true
     eof_retry_delay_in_ms: 500
     cleanup_files_on_init: false
     retention:
-      max_num_of_local_files: 20 
+      max_num_of_local_files: 20
     compress:
       segment:
         enabled: true
       delete_after_compress: true
       idle_threshold: 20
-  
+
   badger:
     single_bucket_mode: true
-    path: '' 
-    memory_mode: false 
-    sync_writes: false 
+    path: ''
+    memory_mode: false
+    sync_writes: false
     mem_table_size: 10485760
     num_mem_tables: 1
     value_log_max_entries: 1000000
@@ -371,7 +376,7 @@ gateway_file_content:
     value_threshold: 1048576
     num_level0_tables: 1
     num_level0_tables_stall: 2
-  
+
   elastic:
     elasticsearch: prod
     enabled: true

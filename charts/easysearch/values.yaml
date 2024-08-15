@@ -92,11 +92,16 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
 
-nodeSelector: {}
+nodeSelector:
+  cloud.infinilabs.com/nodepool: easysearch-node-pool
 
-tolerations: []
+tolerations:
+- key: "dedicated"
+  operator: "Equal"
+  value: "noschedule"
+  effect: "NoSchedule"
 
 affinity: {}
 
-storageClassName: local-path
-dataVolumeStorage: 200Gi
+storageClassName: openebs-hostpath
+dataVolumeStorage: 30Gi
