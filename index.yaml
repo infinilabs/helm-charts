@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   console:
   - apiVersion: v2
+    appVersion: 1.29.4-2108
+    created: "2025-05-14T09:52:10.748259651Z"
+    description: A Helm chart for Kubernetes
+    digest: cc40c8ed8f6abd006eb697ff3698e503430c6305db3f3d701c0c43788ff4be3a
+    name: console
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/console-0.4.0/console-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
     appVersion: 1.26.1-1623
     created: "2024-08-14T12:00:48.618906732Z"
     description: A Helm chart for Kubernetes
@@ -32,6 +42,16 @@ entries:
     - console-0.1.0.tgz
     version: 0.1.0
   easysearch:
+  - apiVersion: v2
+    appVersion: 1.12.2-2106
+    created: "2025-05-14T09:52:10.873673943Z"
+    description: A Helm chart for Kubernetes
+    digest: 40534f6453ab53e5845f10cd61308724159134bbae233adc6c496afc025bafab
+    name: easysearch
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/easysearch-0.4.0/easysearch-0.4.0.tgz
+    version: 0.4.0
   - apiVersion: v2
     appVersion: 1.8.3-265
     created: "2024-08-14T12:00:48.788771258Z"
@@ -64,6 +84,16 @@ entries:
     version: 0.1.0
   gateway:
   - apiVersion: v2
+    appVersion: 1.29.3-2018
+    created: "2025-05-14T09:52:11.014207271Z"
+    description: A Helm chart for Kubernetes
+    digest: 4bef374a58277bed768c5628b1fe86ed99e67aeb13619342677fc45033947d91
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/gateway-0.4.0/gateway-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
     appVersion: 1.26.1-1491
     created: "2024-08-14T12:00:48.904983575Z"
     description: A Helm chart for Kubernetes
@@ -83,4 +113,4 @@ entries:
     urls:
     - gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2024-08-14T12:00:48.905008883Z"
+generated: "2025-05-14T09:52:11.014250742Z"
