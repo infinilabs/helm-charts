@@ -12,7 +12,7 @@ env:
 
 debug:
   enabled: false
-  command: [/gateway-linux-amd64]
+  command: [/gateway]
   args: ["-debug"]
 
 replicaCount: 1
@@ -21,7 +21,7 @@ image:
   repository: infinilabs/gateway
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.26.1-1491"
+  tag: "1.29.3-2018"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -92,19 +92,19 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector:
-  cloud.infinilabs.com/nodepool: easysearch-node-pool
+#nodeSelector:
+#  cloud.infinilabs.com/nodepool: easysearch-node-pool
 
-tolerations:
-- key: "dedicated"
-  operator: "Equal"
-  value: "noschedule"
-  effect: "NoSchedule"
+#tolerations:
+#- key: "dedicated"
+#  operator: "Equal"
+#  value: "noschedule"
+#  effect: "NoSchedule"
 
 affinity: {}
 
-storageClassName: openebs-hostpath
-dataVolumeStorage: 40Gi
+storageClassName: local-path
+dataVolumeStorage: 50Gi
 
 gateway_file_content:
   path.data: data

@@ -41,7 +41,7 @@ data:
     #bootstrap.system_call_filter: false
     #elasticsearch.api_compatibility: true
     
-    security.enabled: false
+    security.enabled: true
     security.audit.type: noop
     security.ssl.transport.cert_file: instance.crt
     security.ssl.transport.key_file: instance.key

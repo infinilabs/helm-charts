@@ -7,11 +7,11 @@ image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.26.1-1623"
+  tag: "1.29.4-2108"
 
 debug:
   enabled: false
-  command: [/console-linux-amd64]
+  command: [/console]
   args: ["-debug"]
   
 imagePullSecrets: []
@@ -87,7 +87,7 @@ tolerations: []
 affinity: {}
 
 storageClassName: local-path
-dataVolumeStorage: 100Gi
+dataVolumeStorage: 50Gi
 
 #need change your settings for github sso
 security_file_content:

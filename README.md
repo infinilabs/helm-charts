@@ -59,6 +59,10 @@ Note: The default storageClass of these charts use is [local-path](https://githu
       secretName: easysearch-ca-secret
     EOF
 
+    ~ kubectl create secret generic easysearch-secrets \
+      --from-literal=ezs_password='Your_Ezs_Complex_Password' \
+      --namespace <namespace>
+
     ~ helm install easysearch infinilabs/easysearch -n <namespace>
   
 #### Uninstall

@@ -8,13 +8,14 @@ masterHosts: '"easysearch-0"'
 discoverySeedHosts: '"easysearch-0.easysearch"'
 nodeRoles: '"master","data","ingest","remote_cluster_client"'
 javaOpts: '-Xms1g -Xmx1g'
-initAdminPassword: "YOUR_INIT_ADMIN_PASSWORD"
+metricsWithAgent: false
+metricsConfigServer: "http://host.orb.internal:30111"
 
 image:
   repository: infinilabs/easysearch
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.8.3-265"
+  tag: "1.12.2-2106"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -38,16 +39,9 @@ podSecurityContext:
 
 podAnnotations: {}
 
-security:
-  enabled: true
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  runAsUser: 0
+  runAsGroup: 0
 
 service:
   # The value of type is one of None, ClusterIP or NodePort.
@@ -103,5 +97,5 @@ tolerations:
 
 affinity: {}
 
-storageClassName: openebs-hostpath
+storageClassName: local-path
 dataVolumeStorage: 30Gi
