@@ -92,14 +92,9 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-#nodeSelector:
-#  cloud.infinilabs.com/nodepool: easysearch-node-pool
+nodeSelector: {}
 
-#tolerations:
-#- key: "dedicated"
-#  operator: "Equal"
-#  value: "noschedule"
-#  effect: "NoSchedule"
+tolerations: []
 
 affinity: {}
 
