@@ -3,6 +3,16 @@ entries:
   console:
   - apiVersion: v2
     appVersion: 1.29.4-2108
+    created: "2025-05-14T10:05:01.417205122Z"
+    description: A Helm chart for Kubernetes
+    digest: 331e9b83d96d737f64584721d7474e0ac14fe807f293432ae8bce3b48af48c42
+    name: console
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/console-0.4.1/console-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
+    appVersion: 1.29.4-2108
     created: "2025-05-14T09:52:10.748259651Z"
     description: A Helm chart for Kubernetes
     digest: cc40c8ed8f6abd006eb697ff3698e503430c6305db3f3d701c0c43788ff4be3a
@@ -42,6 +52,16 @@ entries:
     - console-0.1.0.tgz
     version: 0.1.0
   easysearch:
+  - apiVersion: v2
+    appVersion: 1.12.2-2106
+    created: "2025-05-14T10:05:01.557399704Z"
+    description: A Helm chart for Kubernetes
+    digest: b00aa9b8867939d8af37d6700a2b5d20c2ca66d0b140f560adb77d80ed0f4c99
+    name: easysearch
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/easysearch-0.4.1/easysearch-0.4.1.tgz
+    version: 0.4.1
   - apiVersion: v2
     appVersion: 1.12.2-2106
     created: "2025-05-14T09:52:10.873673943Z"
@@ -85,6 +105,16 @@ entries:
   gateway:
   - apiVersion: v2
     appVersion: 1.29.3-2018
+    created: "2025-05-14T10:05:01.704056288Z"
+    description: A Helm chart for Kubernetes
+    digest: c915da59a52caff9cee3809c1788bf3e220f7e158d47f18c722815fb580fc86a
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/gateway-0.4.1/gateway-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
+    appVersion: 1.29.3-2018
     created: "2025-05-14T09:52:11.014207271Z"
     description: A Helm chart for Kubernetes
     digest: 4bef374a58277bed768c5628b1fe86ed99e67aeb13619342677fc45033947d91
@@ -113,4 +143,4 @@ entries:
     urls:
     - gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-14T09:52:11.014250742Z"
+generated: "2025-05-14T10:05:01.704120863Z"
