@@ -45,6 +45,11 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.env.endpoint }}
+          env:
+            - name: INFINI_CONSOLE_ENDPOINT
+              value: {{ .Values.env.endpoint }}
+          {{- end }}
           {{- if .Values.debug.enabled }}
           command: {{ .Values.debug.command }}
           args: {{ .Values.debug.args }}

@@ -9,7 +9,7 @@ discoverySeedHosts: '"easysearch-0.easysearch"'
 nodeRoles: '"master","data","ingest","remote_cluster_client"'
 javaOpts: '-Xms1g -Xmx1g'
 metricsWithAgent: false
-metricsConfigServer: "http://host.orb.internal:30111"
+metricsConfigServer: "http://console:9000"
 
 image:
   repository: infinilabs/easysearch
