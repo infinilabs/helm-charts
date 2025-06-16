@@ -358,10 +358,10 @@ data:
 
     if [ ! -e /etc/confd/.confd_inited ]; then
       rm -rf /etc/confd/*
+      cp -r /app/easysearch/config/* /etc/confd/
       touch /etc/confd/.confd_inited
     fi
-    
-    cp -r /app/easysearch/config/* /etc/confd/
+
     cat /tmp/confd/templates/jvm.options > /etc/confd/jvm.options
     for opt in $(echo ${JAVA_OPTS}); do
       sed -i 's/'"${opt:0:4}"'1g/'"${opt}"'/' /etc/confd/jvm.options
