@@ -7,7 +7,7 @@ image:
   repository: infinilabs/console
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.29.4-2108"
+  tag: "1.29.6"
 
 env:
   endpoint: "http://console:9000/"
