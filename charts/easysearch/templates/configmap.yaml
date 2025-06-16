@@ -356,9 +356,12 @@ data:
   unitMGR: |
     #!/bin/bash
 
-    rm -rf /etc/confd/*
-    cp -r /app/easysearch/config/* /etc/confd/
+    if [ ! -e /etc/confd/.confd_inited ]; then
+      rm -rf /etc/confd/*
+      touch /etc/confd/.confd_inited
+    fi
     
+    cp -r /app/easysearch/config/* /etc/confd/
     cat /tmp/confd/templates/jvm.options > /etc/confd/jvm.options
     for opt in $(echo ${JAVA_OPTS}); do
       sed -i 's/'"${opt:0:4}"'1g/'"${opt}"'/' /etc/confd/jvm.options
@@ -369,4 +372,5 @@ data:
     cat /tmp/confd/conf.d/confd.toml > /etc/confd/conf.d/confd.toml
     cat /tmp/confd/templates/confd.tmpl > /etc/confd/templates/confd.tmpl
     sed -ir 's/\\//g' /etc/confd/templates/confd.tmpl
+
     /sbin/confd -onetime -backend=env -log-level error
