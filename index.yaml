@@ -53,6 +53,16 @@ entries:
     version: 0.1.0
   easysearch:
   - apiVersion: v2
+    appVersion: 1.13.0
+    created: "2025-06-16T09:58:39.368564548Z"
+    description: A Helm chart for Kubernetes
+    digest: 35a4fa49476d38194ab60afad2760a9cf3ee6c94afa54ec432e34fb32fdf0711
+    name: easysearch
+    type: application
+    urls:
+    - https://github.com/infinilabs/helm-charts/releases/download/easysearch-0.4.2/easysearch-0.4.2.tgz
+    version: 0.4.2
+  - apiVersion: v2
     appVersion: 1.12.2-2106
     created: "2025-05-14T10:05:01.557399704Z"
     description: A Helm chart for Kubernetes
@@ -143,4 +153,4 @@ entries:
     urls:
     - gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-14T10:05:01.704120863Z"
+generated: "2025-06-16T09:58:39.368609472Z"
