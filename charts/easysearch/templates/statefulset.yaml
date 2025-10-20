@@ -41,6 +41,16 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: NODE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_RACK
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.node.labels['rack_id']
+            - name: HTTP_SECURITY
+              value: {{.Values.security.httpEnabled }}
             - name: MASTER_HOSTS
               value: '{{- toString .Values.masterHosts }}'
             - name: DISCOVERY_SEED_HOSTS
@@ -79,8 +89,8 @@ spec:
             - name: EASYSEARCH_INITIAL_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "easysearch.fullname" . }}-secrets
-                  key: ezs_password
+                  name: {{ .Values.security.initialPasswordSecretName }}
+                  key: {{ .Values.security.initialPasswordSecretKey }}
             - name: METRICS_WITH_AGENT
               value: '{{- toString .Values.metricsWithAgent }}'
             - name: METRICS_CONFIG_SERVER

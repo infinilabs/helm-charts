@@ -24,7 +24,7 @@ data:
   confd.tmpl: |-
     cluster.name: {\{getenv "CLUSTER_NAME"}\}
     node.name: {\{getenv "NODE_NAME"}\}
-    #node.attr.rack: r1
+    node.attr.rack: {\{ if getenv "NODE_RACK" \}}{{\getenv "NODE_RACK"}}{{\ else }}"rack1"{{ end }}
     #path.data: /path/to/data
     #path.logs: /path/to/logs
     #bootstrap.memory_lock: true
@@ -47,7 +47,7 @@ data:
     security.ssl.transport.key_file: instance.key
     security.ssl.transport.ca_file: ca.crt
     security.ssl.transport.skip_domain_verify: true
-    security.ssl.http.enabled: false
+    security.ssl.http.enabled: {\{getenv "HTTP_SECURITY"}\}
     security.ssl.http.cert_file: instance.crt
     security.ssl.http.key_file: instance.key
     security.ssl.http.ca_file: ca.crt

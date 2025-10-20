@@ -11,6 +11,12 @@ javaOpts: '-Xms1g -Xmx1g'
 metricsWithAgent: false
 metricsConfigServer: "http://console:9000"
 
+security:
+  enabled: true
+  httpEnabled: false
+  initialPasswordSecretName: easysearch-secrets
+  initialPasswordSecretKey: ezs_password
+
 image:
   repository: infinilabs/easysearch
   pullPolicy: IfNotPresent
