@@ -30,6 +30,7 @@ Note: The default storageClass of these charts use is [local-path](https://githu
 #### Prerequisites
 
 + [cert-manager](https://cert-manager.io/docs/installation/)
++ The initial password needs to be > 8 characters including uppercase, lowercase, number, and special character.
 
 #### Quick Start
 
@@ -59,8 +60,8 @@ Note: The default storageClass of these charts use is [local-path](https://githu
       secretName: easysearch-ca-secret
     EOF
 
-    ~ kubectl create secret generic easysearch-secrets \
-      --from-literal=ezs_password='Your_Ezs_Complex_Password' \
+    ~ kubectl create secret generic easysearch-access-secret \
+      --from-literal=easysearch-pasword='Your_Ezs_Complex_Password_001' \
       --namespace <namespace>
 
     ~ helm install easysearch infinilabs/easysearch -n <namespace>

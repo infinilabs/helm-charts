@@ -7,6 +7,8 @@ replicaCount: 1
 masterHosts: '"easysearch-0"'
 discoverySeedHosts: '"easysearch-0.easysearch"'
 nodeRoles: '"master","data","ingest","remote_cluster_client"'
+#nodeRack: "rack01"
+#nodeToRack: "k8s-node1:rack01,k8s-node2:rack02"
 javaOpts: '-Xms1g -Xmx1g'
 metricsWithAgent: false
 metricsConfigServer: "http://console:9000"
@@ -14,8 +16,9 @@ metricsConfigServer: "http://console:9000"
 security:
   enabled: true
   httpEnabled: false
-  initialPasswordSecretName: easysearch-secrets
-  initialPasswordSecretKey: ezs_password
+  initialPasswordSecretName: easysearch-access-secret
+  initialPasswordSecretKey: easysearch-pasword
+  caSecret: "easysearch-ca-secret"
 
 image:
   repository: infinilabs/easysearch

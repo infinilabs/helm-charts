@@ -4,4 +4,4 @@ metadata:
   name: {{ include "easysearch.fullname" . }}-instance-issuer
 spec:
   ca:
-    secretName: {{ include "easysearch.name" . }}-ca-secret
+    secretName: {{ .Values.security.caSecret }}
