@@ -24,7 +24,7 @@ data:
   confd.tmpl: |-
     cluster.name: {\{getenv "CLUSTER_NAME"}\}
     node.name: {\{getenv "NODE_NAME"}\}
-    #node.attr.rack: r1
+    {\{ if getenv "NODE_RACK" }\}node.attr.rack: {\{getenv "NODE_RACK"}\}{\{ end }\}
     #path.data: /path/to/data
     #path.logs: /path/to/logs
     #bootstrap.memory_lock: true
@@ -38,8 +38,9 @@ data:
     #action.destructive_requires_name: true
     #cluster.routing.allocation.disk.threshold_enabled: false
     #node.max_local_storage_nodes: 3
-    #bootstrap.system_call_filter: false
-    #elasticsearch.api_compatibility: true
+    bootstrap.system_call_filter: false
+    elasticsearch.api_compatibility: true
+    elasticsearch.api_compatibility_version: "7.10.2"
     
     security.enabled: true
     security.audit.type: noop
@@ -47,7 +48,7 @@ data:
     security.ssl.transport.key_file: instance.key
     security.ssl.transport.ca_file: ca.crt
     security.ssl.transport.skip_domain_verify: true
-    security.ssl.http.enabled: false
+    security.ssl.http.enabled: {\{ if getenv "HTTP_SECURITY" }\}{\{getenv "HTTP_SECURITY"}\}{\{ else }\}true{\{ end }\}
     security.ssl.http.cert_file: instance.crt
     security.ssl.http.key_file: instance.key
     security.ssl.http.ca_file: ca.crt
@@ -68,7 +69,7 @@ data:
     security.nodes_dn:
       - 'O=infinilabs'
     
-    security.restapi.roles_enabled: [ "superuser", "security_rest_api_access" ]
+    security.restapi.roles_enabled: [ "superuser", "security_rest_api_access", "security" ]
     
     security.system_indices.enabled: true
     security.ssl.http.clientauth_mode: OPTIONAL
@@ -79,6 +80,8 @@ data:
     ##  curl -k  --cert config/admin.crt --key config/admin.key   -XDELETE 'https://localhost:9200/.infini-*/'
     security.authcz.admin_dn:
       - 'O=infinilabs'
+    security.restapi.password_validation_regex: '(?=.*[A-Z])(?=.*[^a-zA-Z\d])(?=.*[0-9])(?=.*[a-z]).{8,}'
+    security.restapi.password_validation_error_message: "A password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
   jvm.options: |-
     ## JVM configuration
 
@@ -355,13 +358,13 @@ metadata:
 data:
   unitMGR: |
     #!/bin/bash
-
+    echo "Preparing Easysearch configuration with confd..."
     if [ ! -e /etc/confd/.confd_inited ]; then
       rm -rf /etc/confd/*
       cp -r /app/easysearch/config/* /etc/confd/
       touch /etc/confd/.confd_inited
     fi
-
+    echo "Updating JVM and logging options to [${JAVA_OPTS}]..."
     cat /tmp/confd/templates/jvm.options > /etc/confd/jvm.options
     for opt in $(echo ${JAVA_OPTS}); do
       sed -i 's/'"${opt:0:4}"'1g/'"${opt}"'/' /etc/confd/jvm.options
@@ -373,4 +376,24 @@ data:
     cat /tmp/confd/templates/confd.tmpl > /etc/confd/templates/confd.tmpl
     sed -ir 's/\\//g' /etc/confd/templates/confd.tmpl
 
+    echo "Configuring rack awareness with ${NODE_HOST}..."
+    if [ -n "$NODE_HOST" ] && [ -n "$NODE_TO_RACK" ]; then
+      # Use awk to find the rack for the current node from the map string
+      # Map format is "node1:rack1,node2:rack2,..."
+      RACK_ID=$(echo "$NODE_TO_RACK" | awk -F, -v node="$NODE_HOST" '{
+          for(i=1; i<=NF; i++) {
+              if ($i ~ node":") {
+                  split($i, a, ":");
+                  print a[2];
+                  exit;
+              }
+          }
+      }')
+      
+      if [ -n "$RACK_ID" ]; then
+          echo "Found rack ID '${RACK_ID}' for node '${NODE_HOST}'."
+          export NODE_RACK="$RACK_ID"
+      fi
+    fi
+    echo "Running confd with NODE_RACK=${NODE_RACK}..."
     /sbin/confd -onetime -backend=env -log-level error

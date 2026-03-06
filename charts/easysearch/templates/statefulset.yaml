@@ -12,7 +12,6 @@ spec:
     matchLabels:
       {{- include "easysearch.selectorLabels" . | nindent 6 }}
   serviceName: {{ include "easysearch.fullname" . }}
-  minReadySeconds: 30
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -41,6 +40,20 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- if .Values.nodeRack }}
+            - name: NODE_RACK
+              value: {{ .Values.nodeRack | quote }}
+            - name: NODE_TO_RACK
+              value: {{ .Values.nodeToRack | quote }}
+            - name: NODE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            {{- end }}
+            {{- if .Values.security.enabled }}
+            - name: HTTP_SECURITY
+              value: {{ .Values.security.httpEnabled | quote }}
+            {{- end }}
             - name: MASTER_HOSTS
               value: '{{- toString .Values.masterHosts }}'
             - name: DISCOVERY_SEED_HOSTS
@@ -76,11 +89,15 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: NODE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: EASYSEARCH_INITIAL_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "easysearch.fullname" . }}-secrets
-                  key: ezs_password
+                  name: '{{- toString  .Values.security.initialPasswordSecretName }}'
+                  key: '{{- toString .Values.security.initialPasswordSecretKey }}'
             - name: METRICS_WITH_AGENT
               value: '{{- toString .Values.metricsWithAgent }}'
             - name: METRICS_CONFIG_SERVER
@@ -140,6 +157,10 @@ spec:
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   volumeClaimTemplates:
